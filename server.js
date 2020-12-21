@@ -1,4 +1,5 @@
 // dependencies
+// should i use mongojs or mongoose?
 
 const express = require("express");
 const mongojs = require("mongojs");
@@ -17,6 +18,8 @@ app.use(express.urlencoded({
 app.use(express.json());
 
 app.use(express.static("public"));
+
+mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost/workout", { useNewUrlParser: true });
 
 // setting up variables
 const databaseUrl = "workout";
@@ -41,7 +44,32 @@ app.get("/exercise", (req, res) => {
     res.sendFile(path.join(__dirname + "/public/exercise.html"));
 });
 
+// have to use .save when you want to insert a new record via mongojs
+// this route is to post a new exercise to the db
+app.post("/submit", (req, res) => {
+    const exercise = req.body;
 
+    db.exercise.save(exercise, (error, saved) => {
+      if (error) {
+        console.log(error);
+      } else {
+        res.send(saved);
+      }
+    });
+  });
+
+  // i need to require user component that executes on your schema in the models directory to use this lil piece of 
+  //code (activity 11)
+
+  // app.post("/submit", ({ body }, res) => {
+  //   User.create(body)
+  //     .then(dbUser => {
+  //       res.json(dbUser);
+  //     })
+  //     .catch(err => {
+  //       res.json(err);
+  //     });
+  // });
 
 // // view all exercises on stats page
 // // or should the found argument be data?
